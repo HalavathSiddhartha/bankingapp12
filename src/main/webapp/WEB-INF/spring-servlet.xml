@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="
+   http://www.springframework.org/schema/beans     
+   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+   http://www.springframework.org/schema/mvc 
+   http://www.springframework.org/schema/mvc/spring-mvc.xsd
+   http://www.springframework.org/schema/context 
+   http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+	<context:annotation-config />
+	<context:component-scan
+		base-package="bankingapp.controllers" />
+		
+
+	<!-- <security:http auto-config="true"> <security:form-login login-page="/login" 
+		default-target-url="/home" /> <security:logout logout-url="/logout" logout-success-url="/adminLoginProcess?logout" 
+		/> </security:http> <security:authentication-manager> <security:authentication-provider> 
+		<security:user-service> Define user credentials and roles <security:user 
+		name="yourUsername" password="yourPassword" authorities="ROLE_USER" /> Add 
+		more users if needed </security:user-service> </security:authentication-provider> 
+		</security:authentication-manager> -->
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+		name="viewResolver">
+		<property name="prefix" value="/WEB-INF/views/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+	<mvc:resources mapping="/resources/**"
+		location="/WEB-INF/resources/" cache-period="31556926" />
+
+	<!-- <bean class="org.springframework.web.multipart.commons.CommonsMultipartResolver" 
+		name="multipartResolver"> <property name="maxUploadSize" value="-1" /> </bean> -->
+	<!-- Here we will define JdbcTemplate Bean -->
+
+	<!-- Creating bean for jdbc -->
+	<bean
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource"
+		name="ds">
+		<property name="driverClassName">
+			<value>com.mysql.cj.jdbc.Driver</value>
+		</property>
+		<property name="url" value="jdbc:mysql://localhost:3306/bank" /><!-- 
+			banking_management_system -->
+		<property name="username" value="root" />
+		<property name="password" value="12345678" />
+	</bean>
+
+	<bean class="org.springframework.jdbc.core.JdbcTemplate" name="jT">
+		<property name="dataSource">
+			<ref bean="ds" />
+		</property>
+	</bean>
+	<!-- Bean creation of AdminLogin dao -->
+	<bean class="bankingapp.dao.AdminLoginDaoImpl"
+		name="adminLoginDao">
+		<property name="jdbcTemplate">
+			<ref bean="jT" />
+		</property>
+	</bean>
+
+	<bean class="bankingapp.dao.NewAccountDaoImpl" name="account">
+		<property name="jdbcTemplate">
+			<ref bean="jT" />
+		</property>
+	</bean>
+	<bean class="bankingapp.dao.UserdaoImpl" name="userdao">
+		<property name="jdbcTemplate" ref="jT" />
+
+
+	</bean>
+	<bean class="bankingapp.dao.TransDaoimpl" name="transdao">
+		<property name="jdbcTemplate" ref="jT" />
+	</bean>
+	<mvc:resources mapping="/resources/**"
+		location="/resources/theme1/" cache-period="31556926" />
+
+	<mvc:annotation-driven />
+</beans>
